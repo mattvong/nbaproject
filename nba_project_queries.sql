@@ -440,7 +440,7 @@ WHERE (player_id, count) IN (SELECT player_id, MAX(count)
 			     FROM (
 				   SELECT *
 			           FROM common_points_table) sub
-			           GROUP BY player_id)
+			     GROUP BY player_id)
 ORDER BY 1, 2 DESC;
 
 -- Showing the most days missed in-between games for each player, including the start date, end date and reasoning
