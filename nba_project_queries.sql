@@ -10,7 +10,7 @@ CREATE TABLE team (
                    state_province VARCHAR(250),
              	   country VARCHAR(250));
 
--- Inserting the values of the NBA teams into the team information table
+-- Inserting the information of the NBA teams into the team table
 INSERT INTO team (team_id, team_name, city, state_province, country)
 VALUES ('ATL', 'Atlanta Hawks', 'Atlanta', 'Georgia', 'United States'),
        ('BOS', 'Boston Celtics', 'Boston', 'Massachusetts', 'United States'),
@@ -54,7 +54,7 @@ CREATE TABLE player_information (
             			 current_team_id CHAR(3),
             			 FOREIGN KEY (current_team_id) REFERENCES team(team_id));
 
--- Inserting the values of my favourite NBA players into the player information table
+-- Inserting the information of my favourite NBA players into the player information table
 INSERT INTO player_information (first_name, last_name, birth_date, country, draft_year, current_team_id)
 VALUES ('Kevin', 'Durant', '1988-09-29', 'United States', '2007', 'PHO'),
        ('Kyrie', 'Irving', '1992-03-23', 'United States', '2011', 'DAL'),
