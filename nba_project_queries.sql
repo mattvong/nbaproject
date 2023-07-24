@@ -101,7 +101,7 @@ SELECT CONCAT(first_name, ' ', last_name) AS Full_Name,
        Team_Name,
        COUNT(*) AS Games_Played,
        ROUND(AVG(minutes_played), 1) AS MPG,
-	   ROUND(AVG(field_goals_made), 1) AS FGM,
+       ROUND(AVG(field_goals_made), 1) AS FGM,
        ROUND(AVG(field_goals_attempted), 1) AS FGA,
        CONCAT(ROUND(((SUM(field_goals_made) / SUM(field_goals_attempted))*100), 1), '%') AS FG_PCT,
        ROUND(AVG(field_goals_made - three_pointers_made), 1) AS 2PM,
@@ -133,7 +133,7 @@ SELECT CONCAT(first_name, ' ', last_name) AS Full_Name,
        Team_Name,
        COUNT(*) AS Games_Played,
        ROUND(SUM(minutes_played)) AS MP,
-	   SUM(field_goals_made) AS FGM,
+       SUM(field_goals_made) AS FGM,
        SUM(field_goals_attempted) AS FGA,
        SUM(field_goals_made) - SUM(three_pointers_made) AS 2PM,
        SUM(field_goals_attempted) - SUM(three_pointers_attempted) AS 2PA,
@@ -157,7 +157,7 @@ ORDER BY player_game_logs.player_id, game_type DESC, games_played DESC;
 
 -- Calculating the total points, assists and rebounds for each player over the course of the regular season, including the difference in stats each game
 SELECT Player_ID,
-	   Team_ID,
+       Team_ID,
        Game_Date,
        Points_Each_Game,
        points_each_game - LAG(points_each_game) OVER(PARTITION BY player_id ORDER BY game_date) AS Points_Diff_Each_Game,
@@ -168,44 +168,44 @@ SELECT Player_ID,
        Rebounds_Each_Game,
        rebounds_each_game - LAG(rebounds_each_game) OVER(PARTITION BY player_id ORDER BY game_date) AS Rebounds_Diff_Each_Game,
        Total_Rebounds_Season
-FROM
-(SELECT player_id,
-	    team_id,
-	    game_date,
-        points AS points_each_game,
-        SUM(points) OVER(PARTITION BY player_id ORDER BY game_date) AS total_points_season,
-        assists AS assists_each_game,
-        SUM(assists) OVER(PARTITION BY player_id ORDER BY game_date) AS total_assists_season,
-        (offensive_rebounds + defensive_rebounds) AS rebounds_each_game,
-        SUM(offensive_rebounds + defensive_rebounds) OVER(PARTITION BY player_id ORDER BY game_date) AS total_rebounds_season
-		FROM player_game_logs
-		WHERE active_inactive = 'Active' AND game_type = 'Regular Season') sub
-ORDER BY player_id;
+FROM (
+      SELECT player_id,
+	     team_id,
+	     game_date,
+             points AS points_each_game,
+             SUM(points) OVER(PARTITION BY player_id ORDER BY game_date) AS total_points_season,
+             assists AS assists_each_game,
+             SUM(assists) OVER(PARTITION BY player_id ORDER BY game_date) AS total_assists_season,
+             (offensive_rebounds + defensive_rebounds) AS rebounds_each_game,
+             SUM(offensive_rebounds + defensive_rebounds) OVER(PARTITION BY player_id ORDER BY game_date) AS total_rebounds_season
+      FROM player_game_logs
+      WHERE active_inactive = 'Active' AND game_type = 'Regular Season') sub
+ ORDER BY player_id;
 
 -- Calculating the points per game by each player during the months of the regular season, and the difference in points per game each month over the course of the regular season
 WITH monthly_stats AS (
 	SELECT player_id,
-		  (CASE WHEN MONTH(game_date) = '1' THEN 'January'
-                WHEN MONTH(game_date) = '2' THEN 'February'
-                WHEN MONTH(game_date) = '3' THEN 'March'
-                WHEN MONTH(game_date) = '4' THEN 'April'
-                WHEN MONTH(game_date) = '5' THEN 'May'
-                WHEN MONTH(game_date) = '6' THEN 'June'
-                WHEN MONTH(game_date) = '7' THEN 'July'
-                WHEN MONTH(game_date) = '8' THEN 'August'
-                WHEN MONTH(game_date) = '9' THEN 'September'
-                WHEN MONTH(game_date) = '10' THEN 'October'
-                WHEN MONTH(game_date) = '11' THEN 'November'
-                ELSE 'December'END) AS months,
-		   YEAR(game_date) AS years,
-           COUNT(*) AS games_played,
-		   ROUND(AVG(points), 1) AS ppg
+	       (CASE WHEN MONTH(game_date) = '1' THEN 'January'
+               	     WHEN MONTH(game_date) = '2' THEN 'February'
+                     WHEN MONTH(game_date) = '3' THEN 'March'
+                     WHEN MONTH(game_date) = '4' THEN 'April'
+                     WHEN MONTH(game_date) = '5' THEN 'May'
+                     WHEN MONTH(game_date) = '6' THEN 'June'
+                     WHEN MONTH(game_date) = '7' THEN 'July'
+                     WHEN MONTH(game_date) = '8' THEN 'August'
+                     WHEN MONTH(game_date) = '9' THEN 'September'
+                     WHEN MONTH(game_date) = '10' THEN 'October'
+                     WHEN MONTH(game_date) = '11' THEN 'November'
+                     ELSE 'December'END) AS months,
+	       YEAR(game_date) AS years,
+               COUNT(*) AS games_played,
+	       ROUND(AVG(points), 1) AS ppg
 	FROM player_game_logs
 	WHERE active_inactive = 'Active' AND game_type = 'Regular Season'
 	GROUP BY 1, 2, 3
 	ORDER BY 1, 3) 
 SELECT Player_ID,
-	   Months,
+       Months,
        Years, 
        Games_Played,
        PPG, 
