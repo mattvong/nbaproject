@@ -214,39 +214,39 @@ FROM monthly_stats;
 
 -- Calculating the average stats and shooting splits for each player, before and after the 2023 NBA All-Star Break, during the regular season
 WITH pre_post_all_star AS (
-	SELECT pgl.player_id,
-		   first_name,
-           last_name,
-           team_id,
-           'Pre-All Star Break' AS pre_or_post_allstar,
-           COUNT(*) AS games_played,
-           ROUND(AVG(points), 1) AS ppg,
-           ROUND(AVG(assists), 1) AS apg,
-           ROUND(AVG(offensive_rebounds+defensive_rebounds), 1) AS rpg,
-           CONCAT(ROUND(((SUM(field_goals_made) / SUM(field_goals_attempted))*100), 1), '%') AS fg_pct,
-           CONCAT(ROUND(((SUM(three_pointers_made) / SUM(three_pointers_attempted))*100), 1), '%') AS 3p_pct,
-           CONCAT(ROUND(((SUM(free_throws_made) / SUM(free_throws_attempted))*100), 1), '%') AS ft_pct
-	FROM player_game_logs pgl
-	JOIN player_information pi ON pi.player_id = pgl.player_id
-	WHERE game_date BETWEEN '2022-10-18' AND '2023-02-16' AND active_inactive = 'Active'
-	GROUP BY 1, 4
-UNION
-	SELECT pgl.player_id,
-		   first_name,
-           last_name,
-           team_id,
-           'Post-All Star Break' AS pre_or_post_allstar,
-           COUNT(*) AS games_played,
-           ROUND(AVG(points), 1) AS ppg,
-           ROUND(AVG(assists), 1) AS apg,
-           ROUND(AVG(offensive_rebounds+defensive_rebounds), 1) AS rpg,
-           CONCAT(ROUND(((SUM(field_goals_made) / SUM(field_goals_attempted))*100), 1), '%') AS fg_pct,
-           CONCAT(ROUND(((SUM(three_pointers_made) / SUM(three_pointers_attempted))*100), 1), '%') AS 3p_pct,
-           CONCAT(ROUND(((SUM(free_throws_made) / SUM(free_throws_attempted))*100), 1), '%') AS ft_pct
-	FROM player_game_logs pgl
-	JOIN player_information pi ON pi.player_id = pgl.player_id
-	WHERE game_date BETWEEN '2023-02-23' AND '2023-04-09' AND active_inactive = 'Active'
-	GROUP BY 1, 4)
+			   SELECT pgl.player_id,
+		   		  first_name,
+           			  last_name,
+           			  team_id,
+           			  'Pre-All Star Break' AS pre_or_post_allstar,
+           			  COUNT(*) AS games_played,
+           			  ROUND(AVG(points), 1) AS ppg,
+           			  ROUND(AVG(assists), 1) AS apg,
+           			  ROUND(AVG(offensive_rebounds+defensive_rebounds), 1) AS rpg,
+           			  CONCAT(ROUND(((SUM(field_goals_made) / SUM(field_goals_attempted))*100), 1), '%') AS fg_pct,
+           			  CONCAT(ROUND(((SUM(three_pointers_made) / SUM(three_pointers_attempted))*100), 1), '%') AS 3p_pct,
+           			  CONCAT(ROUND(((SUM(free_throws_made) / SUM(free_throws_attempted))*100), 1), '%') AS ft_pct
+			   FROM player_game_logs pgl
+			   JOIN player_information pi ON pi.player_id = pgl.player_id
+			   WHERE game_date BETWEEN '2022-10-18' AND '2023-02-16' AND active_inactive = 'Active'
+			   GROUP BY 1, 4
+			   UNION
+			   SELECT pgl.player_id,
+		   	          first_name,
+           			  last_name,
+           			  team_id,
+          			  'Post-All Star Break' AS pre_or_post_allstar,
+          			  COUNT(*) AS games_played,
+          		          ROUND(AVG(points), 1) AS ppg,
+           			  ROUND(AVG(assists), 1) AS apg,
+           			  ROUND(AVG(offensive_rebounds+defensive_rebounds), 1) AS rpg,
+           			  CONCAT(ROUND(((SUM(field_goals_made) / SUM(field_goals_attempted))*100), 1), '%') AS fg_pct,
+           		 	  CONCAT(ROUND(((SUM(three_pointers_made) / SUM(three_pointers_attempted))*100), 1), '%') AS 3p_pct,
+          			  CONCAT(ROUND(((SUM(free_throws_made) / SUM(free_throws_attempted))*100), 1), '%') AS ft_pct
+			   FROM player_game_logs pgl
+			   JOIN player_information pi ON pi.player_id = pgl.player_id
+			   WHERE game_date BETWEEN '2023-02-23' AND '2023-04-09' AND active_inactive = 'Active'
+			   GROUP BY 1, 4)
 SELECT CONCAT(first_name,' ', last_name) AS Full_Name,
        Team_ID,
        pre_or_post_allstar AS 'Pre/Post All-Star Break',
@@ -262,27 +262,27 @@ ORDER BY player_id, 3 DESC;
 
 -- Showing the most points, assists and rebounds by each player against each team during the regular season, dependent on the team the player played for
 WITH opp_team_names AS (
-	SELECT DISTINCT(team_name) AS opp_team_name,
-		   opp_team_id
-	FROM player_game_logs pgl
-	JOIN team t ON t.team_id = pgl.opp_team_id
-	ORDER BY 1)
-		SELECT CONCAT(pi.first_name,' ', pi.last_name) AS 'Full Name',
-			   t.team_name AS 'Team Name',
-               sub.opp_team_name AS "Opponent's Team Name",
-               MAX(points) AS 'Most Points',
-               MAX(assists) AS 'Most Assists',
-               MAX(offensive_rebounds + defensive_rebounds) AS 'Most Rebounds'
-		FROM
-				(SELECT opp_team_name,
-						pgl.*
-				 FROM opp_team_names otn
-				 JOIN player_game_logs pgl ON pgl.opp_team_id = otn.opp_team_id) sub
-		JOIN team t ON t.team_id = sub.team_id
-		JOIN player_information pi ON pi.player_id = sub.player_id
-		WHERE active_inactive = 'Active' AND game_type = 'Regular Season'
-		GROUP BY sub.player_id, t.team_name, sub.opp_team_name
-		ORDER BY sub.player_id, sub.opp_team_name, t.team_name;
+			SELECT DISTINCT(team_name) AS opp_team_name,
+		   	       opp_team_id
+			FROM player_game_logs pgl
+			JOIN team t ON t.team_id = pgl.opp_team_id
+			ORDER BY 1)
+SELECT CONCAT(pi.first_name,' ', pi.last_name) AS 'Full Name',
+       t.team_name AS 'Team Name',
+       sub.opp_team_name AS "Opponent's Team Name",
+       MAX(points) AS 'Most Points',
+       MAX(assists) AS 'Most Assists',
+       MAX(offensive_rebounds + defensive_rebounds) AS 'Most Rebounds'
+FROM (
+      SELECT opp_team_name,
+ 	     pgl.*
+      FROM opp_team_names otn
+      JOIN player_game_logs pgl ON pgl.opp_team_id = otn.opp_team_id) sub
+JOIN team t ON t.team_id = sub.team_id
+JOIN player_information pi ON pi.player_id = sub.player_id
+WHERE active_inactive = 'Active' AND game_type = 'Regular Season'
+GROUP BY sub.player_id, t.team_name, sub.opp_team_name
+ORDER BY sub.player_id, sub.opp_team_name, t.team_name;
 
 -- Showing the game stats for each player's season high and season low in points during the regular season
 SELECT CONCAT(first_name,' ', last_name) AS Full_Name,
