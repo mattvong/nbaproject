@@ -448,7 +448,7 @@ WITH days_missed AS (
 	 	     SELECT pgl1.player_id,
 		    	    pgl1.game_date,
 		    	    DATEDIFF(MIN(pgl2.game_date), pgl1.game_date) AS diff,
-		    	    LEAD(pgl1.game_date) OVER(PARTITION BY pgl1.player_id ORDER BY pgl1.game_date) AS end_date
+		    	    MIN(pgl2.game_date) AS end_date
 	 	     FROM player_game_logs pgl1
 	 	     JOIN player_game_logs pgl2 ON pgl2.player_id = pgl1.player_id AND pgl2.game_date > pgl1.game_date 
 	 	     WHERE (pgl1.active_inactive = 'Active' AND pgl1.game_type = 'Regular Season') AND
