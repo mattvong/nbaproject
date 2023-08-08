@@ -448,24 +448,27 @@ WITH days_missed AS (
 	 	     SELECT pgl1.player_id,
 		    	    pgl1.game_date,
 		    	    DATEDIFF(MIN(pgl2.game_date), pgl1.game_date) AS diff,
+		    	    LEAD(pgl1.game_id) OVER (PARTITION BY player_id) - pgl1.game_id - 1 AS game_diff,
 		    	    MIN(pgl2.game_date) AS end_date
 	 	     FROM player_game_logs pgl1
 	 	     JOIN player_game_logs pgl2 ON pgl2.player_id = pgl1.player_id AND pgl2.game_date > pgl1.game_date 
 	 	     WHERE (pgl1.active_inactive = 'Active' AND pgl1.game_type = 'Regular Season') AND
 		           (pgl2.active_inactive = 'Active' AND pgl2.game_type = 'Regular Season')
-	 	     GROUP BY pgl1.player_id, pgl1.game_date),
+	 	     GROUP BY pgl1.player_id, pgl1.game_date, pgl1.game_id),
 max_diff_extraction AS (
 			SELECT player_id,
-		    	       MAX(diff) as max_diff
+		    	       MAX(game_diff) AS max_game_diff,
+		    	       MAX(diff) AS max_diff
 			FROM days_missed
 			GROUP BY 1),
 final_table AS (
 		SELECT *
 		FROM days_missed
-		WHERE (player_id, diff) IN (SELECT *
+		WHERE (player_id, game_diff, diff) IN (SELECT *
 					    FROM max_diff_extraction))
 SELECT CONCAT(first_name, ' ', last_name) AS Full_Name,
-       diff AS Most_Days_Missed,
+       diff AS Days_Missed,
+       game_diff AS Games_Missed,
        game_date AS Start_Date,
        end_date AS End_Date,
        (CASE WHEN ft.player_id = 1 THEN 'Injury'
