@@ -543,7 +543,7 @@ SELECT CONCAT(first_name, ' ', last_name) AS Full_Name,
        min_opp_team_id AS First_Opp_Team_ID,
        max_date AS End_Date,
        max_opp_team_id AS Last_Opp_Team_ID,
-       win_streak AS Longest_Win_Streak,
+       win_streak AS Win_Streak,
        DATEDIFF(max_date, min_date) AS Total_Days
 FROM final_table ft
 JOIN player_information pi ON pi.player_id = ft.player_id
